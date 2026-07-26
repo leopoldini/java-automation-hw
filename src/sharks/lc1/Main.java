@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("\n         Password Validator for MAIN merge conflict =( ");
+        System.out.println("\n         Password Validator for DEV merge conflict =( ");
         System.out.print("\nEnter password: ");
 
         String userPassword = scanner.nextLine();
