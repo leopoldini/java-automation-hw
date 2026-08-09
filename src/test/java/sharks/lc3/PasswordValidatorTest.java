@@ -5,6 +5,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import sharks.lc3.helpers.TestHelper;
 
 public class PasswordValidatorTest {
 
@@ -20,28 +21,6 @@ public class PasswordValidatorTest {
     public void tearDown() {
         System.out.println("[AFTER METHOD] Cleaning up history collection...");
         historyManager.clearHistory();
-    }
-
-    @DataProvider(name = "validPasswords")
-    public Object[][] validPasswordProvider() {
-        return new Object[][]{
-                {"P@ssword1"},
-                {"Secure#2026"},
-                {"MyComplex123!"}
-        };
-    }
-
-    @DataProvider(name = "invalidPasswords")
-    public Object[][] invalidPasswordProvider() {
-        return new Object[][]{
-                {""},
-                {"Admin"},
-                {"12345678"},
-                {"password123!"},
-                {"PASSWORD123!"},
-                {"Password!"},
-                {"Password123"}
-        };
     }
 
     @Test(dataProvider = "validPasswords", groups = {"smoke", "regression"})
@@ -96,5 +75,27 @@ public class PasswordValidatorTest {
         Assert.assertTrue(isRemoved, "Password should be successfully removed");
         Assert.assertEquals(historyManager.getSize(), 0, "Size should be 0 after removal");
         Assert.assertFalse(historyManager.containsPassword(pass), "Removed password should no longer exist in collection");
+    }
+
+    @DataProvider(name = "validPasswords")
+    public Object[][] validPasswordProvider() {
+        return new Object[][]{
+                {"P@ssword1"},
+                {"Secure#2026"},
+                {"MyComplex123!"}
+        };
+    }
+
+    @DataProvider(name = "invalidPasswords")
+    public Object[][] invalidPasswordProvider() {
+        return new Object[][]{
+                {""},
+                {"Admin"},
+                {"12345678"},
+                {"password123!"},
+                {"PASSWORD123!"},
+                {"Password!"},
+                {"Password123"}
+        };
     }
 }

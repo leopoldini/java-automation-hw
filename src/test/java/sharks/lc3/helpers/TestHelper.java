@@ -1,4 +1,4 @@
-package sharks.lc3;
+package sharks.lc3.helpers;
 
 public class TestHelper {
 
