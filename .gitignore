@@ -33,3 +33,7 @@ bin/
 .gradle/
 build/
 lib/
+
+### IntelliJ IDEA Extra ###
+.idea/
+*.iml
