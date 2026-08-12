@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'sharks.lc1'
+group = 'sharks'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.microsoft.playwright:playwright:1.41.0'
+
     testImplementation 'org.testng:testng:7.9.0'
 }
 
