@@ -2,6 +2,7 @@ package sharks.lc4.tests;
 
 import com.microsoft.playwright.*;
 import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -47,6 +48,16 @@ public abstract class BaseTest {
         }
         if (context != null) {
             context.close();
+        }
+    }
+
+    @AfterClass
+    public void tearDownClass() {
+        if (browser != null) {
+            browser.close();
+        }
+        if (playwright != null) {
+            playwright.close();
         }
     }
 }
