@@ -10,58 +10,79 @@ import java.util.UUID;
 
 public class WebShopTests extends BaseTest {
 
-    private final String uniqueEmail = "test_user_" + UUID.randomUUID().toString().substring(0, 8) + "@test.com";
     private final String userPassword = "Password123!";
 
-    @Test(priority = 1)
-    public void testSuccessfulRegistration() {
+    private String generateRandomEmail() {
+        return "test_user_" + UUID.randomUUID().toString().substring(0, 8) + "@test.com";
+    }
+
+    private String registerNewUser() {
+        String email = generateRandomEmail();
         HomePage homePage = new HomePage(page);
         homePage.clickRegister();
 
         RegisterPage registerPage = new RegisterPage(page);
-        registerPage.registerUser("Leonid", "QA", uniqueEmail, userPassword);
+        registerPage.registerUser("Leonid", "QA", email, userPassword);
+        return email;
+    }
+
+    @Test
+    public void testSuccessfulRegistration() {
+        String email = generateRandomEmail();
+
+        HomePage homePage = new HomePage(page);
+        homePage.clickRegister();
+
+        RegisterPage registerPage = new RegisterPage(page);
+        registerPage.registerUser("Leonid", "QA", email, userPassword);
 
         Assert.assertTrue(registerPage.getRegistrationResultText().contains("Your registration completed"),
                 "Registration should be successful");
     }
 
-    @Test(priority = 2)
+    @Test
     public void testSuccessfulLogin() {
+
+        String email = registerNewUser();
+
         HomePage homePage = new HomePage(page);
         homePage.clickLogin();
 
         LoginPage loginPage = new LoginPage(page);
-        loginPage.login(uniqueEmail, userPassword);
+        loginPage.login(email, userPassword);
 
         Assert.assertTrue(homePage.isUserLoggedIn(), "Logout link should be visible after login");
     }
 
-    @Test(priority = 3)
+    @Test
     public void testLogout() {
+
+        String email = registerNewUser();
+
         HomePage homePage = new HomePage(page);
         homePage.clickLogin();
 
         LoginPage loginPage = new LoginPage(page);
-        loginPage.login(uniqueEmail, userPassword);
+        loginPage.login(email, userPassword);
 
         homePage.clickLogout();
 
         Assert.assertFalse(homePage.isUserLoggedIn(), "Logout link should disappear after logout");
     }
 
-    @Test(priority = 4)
+    @Test
     public void testInvalidLogin() {
         HomePage homePage = new HomePage(page);
         homePage.clickLogin();
 
         LoginPage loginPage = new LoginPage(page);
-        loginPage.login("invalid_email_12345@gmail.com", "WrongPassword!");
+        loginPage.login("non_existing_user_999@gmail.com", "WrongPassword!");
 
         Assert.assertTrue(loginPage.getErrorMessage().contains("Login was unsuccessful"),
                 "Error message should be displayed for invalid credentials");
     }
 
-    @Test(priority = 5)
+    @Test
     public void testSearchProduct() {
         HomePage homePage = new HomePage(page);
         String searchItem = "Computer";
