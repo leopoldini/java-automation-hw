@@ -1,6 +1,25 @@
-package sharks.lc1;
+package sharks.lc3;
 
 public class PasswordValidator {
+    public static boolean isValid(String password) {
+        if (password == null || password.isEmpty()) return false;
+        if (CommonPassword.LIST.contains(password.toLowerCase())) return false;
+        if (password.length() < 8) return false;
+
+        boolean upper = false;
+        boolean lower = false;
+        boolean digit = false;
+        boolean specialChar = false;
+
+        for (char ch : password.toCharArray()) {
+            if (Character.isUpperCase(ch)) upper = true;
+            else if (Character.isLowerCase(ch)) lower = true;
+            else if (Character.isDigit(ch)) digit = true;
+            else specialChar = true;
+        }
+
+        return upper && lower && digit && specialChar;
+    }
 
     public static void validatePassword(String password) {
         if (password == null || password.isEmpty()) {
@@ -15,13 +34,13 @@ public class PasswordValidator {
             System.out.println("Error: Password must be at least 8 characters long!");
             return;
         }
+
         boolean upper = false;
         boolean lower = false;
         boolean digit = false;
         boolean specialChar = false;
 
         for (char ch : password.toCharArray()) {
-
             if (Character.isUpperCase(ch)) {
                 upper = true;
             } else if (Character.isLowerCase(ch)) {
@@ -32,6 +51,7 @@ public class PasswordValidator {
                 specialChar = true;
             }
         }
+
         if (!upper) {
             System.out.println("Error: Password must contain at least one uppercase LETTER: ABC...");
         }

@@ -1,4 +1,4 @@
-package sharks.lc1;
+package sharks.lc3;
 
 import java.util.Scanner;
 
