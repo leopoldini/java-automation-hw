@@ -9,6 +9,10 @@ import sharks.lc3.helpers.TestHelper;
 
 public class PasswordValidatorTest {
 
+    private static final int INITIAL_COLLECTION_SIZE = 0;
+    private static final int EXPECTED_SIZE_AFTER_ADDITIONS = 2;
+    private static final int EXPECTED_SIZE_AFTER_REMOVAL = 0;
+
     private PasswordHistoryManager historyManager;
 
     @BeforeMethod(alwaysRun = true)
@@ -46,12 +50,12 @@ public class PasswordValidatorTest {
     @Test(groups = {"collection", "smoke"})
     public void testCollectionAddAndSize() {
         TestHelper.logTestStart("testCollectionAddAndSize");
-        Assert.assertEquals(historyManager.getSize(), 0, "Initial size should be 0");
+        Assert.assertEquals(historyManager.getSize(), INITIAL_COLLECTION_SIZE, "Initial size should be 0");
 
         historyManager.addPassword("P@ssword1");
         historyManager.addPassword("Secure#2026");
 
-        Assert.assertEquals(historyManager.getSize(), 2, "Collection size should be 2 after additions");
+        Assert.assertEquals(historyManager.getSize(), EXPECTED_SIZE_AFTER_ADDITIONS, "Collection size should be 2 after additions");
     }
 
     @Test(groups = {"collection"})
@@ -73,7 +77,7 @@ public class PasswordValidatorTest {
         boolean isRemoved = historyManager.removePassword(pass);
 
         Assert.assertTrue(isRemoved, "Password should be successfully removed");
-        Assert.assertEquals(historyManager.getSize(), 0, "Size should be 0 after removal");
+        Assert.assertEquals(historyManager.getSize(), EXPECTED_SIZE_AFTER_REMOVAL, "Size should be 0 after removal");
         Assert.assertFalse(historyManager.containsPassword(pass), "Removed password should no longer exist in collection");
     }
 
