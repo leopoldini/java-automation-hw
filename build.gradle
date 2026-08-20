@@ -13,6 +13,8 @@ dependencies {
     implementation 'com.microsoft.playwright:playwright:1.41.0'
 
     testImplementation 'org.testng:testng:7.9.0'
+    testImplementation 'org.slf4j:slf4j-api:2.0.12'
+    testImplementation 'ch.qos.logback:logback-classic:1.5.3'
 }
 
 test {
