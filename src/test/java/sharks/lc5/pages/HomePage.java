@@ -1,6 +1,7 @@
 package sharks.lc5.pages;
 
 import com.microsoft.playwright.Page;
+import java.util.List;
 
 public class HomePage extends BasePage {
 
@@ -36,8 +37,13 @@ public class HomePage extends BasePage {
         click(searchButton, "Search Button");
     }
 
-    public boolean isProductFound(String productName) {
-        return page.locator(productTitle).allInnerTexts().stream()
-                .anyMatch(title -> title.toLowerCase().contains(productName.toLowerCase()));
+    public boolean isProductFound(String expectedName) {
+        List<String> titles = getAllTexts(productTitle);
+        for (String title : titles) {
+            if (title.toLowerCase().contains(expectedName.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

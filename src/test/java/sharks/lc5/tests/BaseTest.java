@@ -37,20 +37,35 @@ public abstract class BaseTest {
 
     @AfterMethod
     public void tearDown(ITestResult result) {
-        if (ITestResult.FAILURE == result.getStatus()) {
-            LoggerUtil.error("Test FAILED: " + result.getName());
-            String screenshotName = result.getName() + "_" + System.currentTimeMillis() + ".png";
-            String path = ConfigManager.getProperty("screenshotPath", "build/screenshots/") + screenshotName;
-
-            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(path)).setFullPage(true));
-            LoggerUtil.info("Screenshot saved to: " + path);
-        } else if (ITestResult.SUCCESS == result.getStatus()) {
-            LoggerUtil.info("Test PASSED: " + result.getName());
-        }
+        processTestResult(result);
 
         if (context != null) {
             context.close();
         }
+    }
+
+    private void processTestResult(ITestResult result) {
+        if (result.getStatus() == ITestResult.FAILURE) {
+            handleFailure(result);
+        } else if (result.getStatus() == ITestResult.SUCCESS) {
+            handleSuccess(result);
+        }
+    }
+
+    private void handleFailure(ITestResult result) {
+        LoggerUtil.error("Test FAILED: " + result.getName());
+        takeScreenshot(result.getName());
+    }
+
+    private void handleSuccess(ITestResult result) {
+        LoggerUtil.info("Test PASSED: " + result.getName());
+    }
+
+    private void takeScreenshot(String testName) {
+        String screenshotName = testName + "_" + System.currentTimeMillis() + ".png";
+        String path = ConfigManager.getProperty("screenshotPath", "build/screenshots/") + screenshotName;
+        page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(path)).setFullPage(true));
+        LoggerUtil.info("Screenshot saved to: " + path);
     }
 
     @AfterClass

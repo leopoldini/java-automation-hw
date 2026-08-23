@@ -1,14 +1,17 @@
 package sharks.lc5.providers;
 
 import org.testng.annotations.DataProvider;
+import sharks.lc5.utils.DataGenerator;
 
 public class UserDataProvider {
 
     @DataProvider(name = "invalidLoginData")
     public static Object[][] getInvalidLoginData() {
         return new Object[][]{
-                {"invalid_email_1@gmail.com", "WrongPassword1!"},
-                {"invalid_email_2@gmail.com", "WrongPassword2!"}
+                {DataGenerator.getRandomEmail(), "WrongPassword1!"},
+                {"nonexistent_" + DataGenerator.getRandomEmail(), "Password123!"},
+                {DataGenerator.getRandomEmail(), "123"},
+                {"unknown_user@domain.com", "Password123!"}
         };
     }
 
