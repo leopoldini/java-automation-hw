@@ -16,7 +16,7 @@ public class WebShopFrameworkTests extends BaseTest {
     private final String defaultPassword = "Password123!";
 
     private String registerNewUser() {
-        String email = DataGenerator.getRandomEmail();
+        String email = DataGenerator.getSharksCodeEmail();
         HomePage homePage = new HomePage(page);
         homePage.clickRegister();
 
@@ -29,7 +29,7 @@ public class WebShopFrameworkTests extends BaseTest {
     @Test
     public void testSuccessfulRegistration() {
         LoggerUtil.info("Starting testSuccessfulRegistration...");
-        String email = DataGenerator.getRandomEmail();
+        String email = DataGenerator.getSharksCodeEmail();
 
         HomePage homePage = new HomePage(page);
         homePage.clickRegister();

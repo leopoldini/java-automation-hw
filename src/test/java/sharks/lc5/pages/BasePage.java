@@ -32,4 +32,11 @@ public abstract class BasePage {
         LoggerUtil.info("Checking visibility of selector: " + selector + " -> " + visible);
         return visible;
     }
+    public boolean isElementVisible(String selector) {
+        try {
+            return page.locator(selector).first().isVisible();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
