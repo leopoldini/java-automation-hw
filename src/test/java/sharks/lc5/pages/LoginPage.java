@@ -1,6 +1,7 @@
 package sharks.lc5.pages;
 
 import com.microsoft.playwright.Page;
+import io.qameta.allure.Step;
 
 public class LoginPage extends BasePage {
 
@@ -13,12 +14,14 @@ public class LoginPage extends BasePage {
         super(page);
     }
 
+    @Step("Log in with email: '{email}'")
     public void login(String email, String password) {
-        type(emailInput, email, "Email Field");
-        type(passwordInput, password, "Password Field");
-        click(loginButton, "Login Button");
+        page.fill(emailInput, email);
+        page.fill(passwordInput, password);
+        page.click(loginButton);
     }
 
+    @Step("Get validation error message text")
     public String getErrorMessage() {
         return getText(errorMessage);
     }
