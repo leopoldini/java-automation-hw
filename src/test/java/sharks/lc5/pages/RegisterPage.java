@@ -1,10 +1,10 @@
 package sharks.lc5.pages;
 
 import com.microsoft.playwright.Page;
+import io.qameta.allure.Step;
 
 public class RegisterPage extends BasePage {
 
-    private final String genderMaleRadio = "#gender-male";
     private final String firstNameInput = "#FirstName";
     private final String lastNameInput = "#LastName";
     private final String emailInput = "#Email";
@@ -17,16 +17,17 @@ public class RegisterPage extends BasePage {
         super(page);
     }
 
+    @Step("Register new user: '{firstName} {lastName}', Email: '{email}'")
     public void registerUser(String firstName, String lastName, String email, String password) {
-        click(genderMaleRadio, "Gender Male Radio");
-        type(firstNameInput, firstName, "First Name Field");
-        type(lastNameInput, lastName, "Last Name Field");
-        type(emailInput, email, "Email Field");
-        type(passwordInput, password, "Password Field");
-        type(confirmPasswordInput, password, "Confirm Password Field");
-        click(registerButton, "Register Button");
+        page.fill(firstNameInput, firstName);
+        page.fill(lastNameInput, lastName);
+        page.fill(emailInput, email);
+        page.fill(passwordInput, password);
+        page.fill(confirmPasswordInput, password);
+        page.click(registerButton);
     }
 
+    @Step("Get registration confirmation message")
     public String getRegistrationResultText() {
         return getText(resultMessage);
     }
