@@ -1,1 +1,0 @@
-{"uuid":"560655c1-afe4-409c-9e2f-68fe453dd5c8","name":"sharks.lc4.tests.BaseTest.setUp","children":["4a955fe5-9c9b-42a3-abf1-9e27ce97206d"],"description":"","befores":[{"name":"setUp","status":"passed","stage":"finished","description":"","steps":[],"attachments":[],"parameters":[],"start":1788123607781,"stop":1788123609243}],"afters":[],"start":1788123607781,"stop":1788123609243}

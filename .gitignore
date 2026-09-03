@@ -37,3 +37,5 @@ lib/
 ### IntelliJ IDEA Extra ###
 .idea/
 *.iml
+
+allure-results/
