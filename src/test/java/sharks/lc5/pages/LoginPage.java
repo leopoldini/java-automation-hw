@@ -16,9 +16,9 @@ public class LoginPage extends BasePage {
 
     @Step("Log in with email: '{email}'")
     public void login(String email, String password) {
-        page.fill(emailInput, email);
-        page.fill(passwordInput, password);
-        page.click(loginButton);
+        type(emailInput, email, "Email Field");
+        type(passwordInput, password, "Password Field");
+        click(loginButton, "Login Button");
     }
 
     @Step("Get validation error message text")

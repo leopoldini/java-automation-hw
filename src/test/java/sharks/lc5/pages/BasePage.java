@@ -12,10 +12,24 @@ public abstract class BasePage {
         this.page = page;
     }
 
+    protected void click(String selector, String elementName) {
+        LoggerUtil.info("Clicking on: " + elementName);
+        page.locator(selector).click();
+    }
+
+    protected void type(String selector, String value, String elementName) {
+        LoggerUtil.info("Typing '" + value + "' into: " + elementName);
+        page.locator(selector).fill(value);
+    }
+
     protected String getText(String selector) {
         String text = page.locator(selector).innerText();
         LoggerUtil.info("Extracted text: '" + text + "'");
         return text;
+    }
+
+    protected boolean isVisible(String selector) {
+        return page.locator(selector).isVisible();
     }
 
     public List<String> getProductTitles(String selector) {

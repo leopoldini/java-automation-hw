@@ -19,12 +19,12 @@ public class RegisterPage extends BasePage {
 
     @Step("Register new user: '{firstName} {lastName}', Email: '{email}'")
     public void registerUser(String firstName, String lastName, String email, String password) {
-        page.fill(firstNameInput, firstName);
-        page.fill(lastNameInput, lastName);
-        page.fill(emailInput, email);
-        page.fill(passwordInput, password);
-        page.fill(confirmPasswordInput, password);
-        page.click(registerButton);
+        type(firstNameInput, firstName, "First Name Field");
+        type(lastNameInput, lastName, "Last Name Field");
+        type(emailInput, email, "Email Field");
+        type(passwordInput, password, "Password Field");
+        type(confirmPasswordInput, password, "Confirm Password Field");
+        click(registerButton, "Register Button");
     }
 
     @Step("Get registration confirmation message")

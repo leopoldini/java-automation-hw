@@ -19,27 +19,27 @@ public class HomePage extends BasePage {
 
     @Step("Click on 'Register' link in top navigation bar")
     public void clickRegister() {
-        page.click(registerLink);
+        click(registerLink, "Register Link");
     }
 
     @Step("Click on 'Log in' link in top navigation bar")
     public void clickLogin() {
-        page.click(loginLink);
+        click(loginLink, "Login Link");
     }
 
     @Step("Click on 'Log out' link")
     public void clickLogout() {
-        page.click(logoutLink);
+        click(logoutLink, "Logout Link");
     }
 
     @Step("Verify if user account header is displayed")
     public boolean isUserLoggedIn() {
-        return page.isVisible(accountEmail);
+        return isVisible(accountEmail);
     }
 
     @Step("Search for product: '{productName}'")
     public void searchProduct(String productName) {
-        page.fill(searchInput, productName);
+        type(searchInput, productName, "Search Input");
         page.keyboard().press("Enter");
     }
 
