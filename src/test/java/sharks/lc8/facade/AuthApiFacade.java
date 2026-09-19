@@ -8,6 +8,7 @@ import sharks.lc8.api.SlotCityApiClient;
 import sharks.lc8.config.ConfigManager;
 import sharks.lc8.models.AuthResponseDto;
 import sharks.lc8.models.GuestResponseDto;
+import sharks.lc8.models.PromocodeResponseDto;
 import sharks.lc8.models.UserDto;
 
 public class AuthApiFacade {
@@ -67,7 +68,7 @@ public class AuthApiFacade {
         Assert.assertEquals(response.getStatusCode(), 200, "Login status code");
 
         AuthResponseDto auth = response.as(AuthResponseDto.class);
-        Assert.assertTrue(auth.isStatus(), "Login status flag");
+        Assert.assertTrue(auth.isStatus(), "Login failed: " + response.asString());
 
         token = auth.getUser().getToken();
         Assert.assertNotNull(token, "Token after login");
@@ -76,10 +77,27 @@ public class AuthApiFacade {
 
     @Step("Activate promocode")
     public AuthApiFacade activatePromocode() {
-        Response response = apiClient.activatePromocode(token, config.getPromocode());
+        return activatePromocode(config.getPromocode());
+    }
+
+    @Step("Activate promocode {promocode}")
+    public AuthApiFacade activatePromocode(String promocode) {
+        Response response = apiClient.activatePromocode(token, promocode);
         Assert.assertEquals(response.getStatusCode(), 200, "Promocode activation status code");
-        Assert.assertTrue(response.jsonPath().getBoolean("status"),
-                "Promocode activation failed: " + response.asString());
+
+        PromocodeResponseDto result = response.as(PromocodeResponseDto.class);
+        Assert.assertTrue(result.isStatus(), "Promocode activation failed: " + result.getReason());
+        return this;
+    }
+
+    @Step("Try to activate unknown promocode {promocode}")
+    public AuthApiFacade activateUnknownPromocode(String promocode) {
+        Response response = apiClient.activatePromocode(token, promocode);
+        Assert.assertEquals(response.getStatusCode(), 200, "Promocode activation status code");
+
+        PromocodeResponseDto result = response.as(PromocodeResponseDto.class);
+        Assert.assertFalse(result.isStatus(), "Unknown promocode should not be activated");
+        Assert.assertEquals(result.getReason(), "Promocode not found", "Rejection reason");
         return this;
     }
 
