@@ -9,6 +9,15 @@ repositories {
     mavenCentral()
 }
 
+// A separate "bucket" for the AspectJ agent jar. It is not a normal dependency of our code:
+// we only need the path to its file to start the tests with -javaagent (see test { } below).
+configurations {
+    agent {
+        canBeResolved = true
+        canBeConsumed = true
+    }
+}
+
 dependencies {
     implementation 'com.microsoft.playwright:playwright:1.41.0'
 
@@ -26,9 +35,13 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
-
+    // Allure uses this agent to notice our @Step methods.
+    // Without it the tests run fine, but the steps never appear in the Allure report.
+    agent 'org.aspectj:aspectjweaver:1.9.22'
 }
 
 test {
     useTestNG()
+    // Start the test JVM with the AspectJ agent attached
+    jvmArgs = ["-javaagent:${configurations.agent.singleFile}"]
 }

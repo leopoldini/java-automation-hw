@@ -12,7 +12,6 @@ public class RegisterPage extends BasePage {
     private static final String PASSWORD = "#Password";
     private static final String CONFIRM_PASSWORD = "#ConfirmPassword";
     private static final String REGISTER_BUTTON = "#register-button";
-    private static final String RESULT_MESSAGE = ".result";
 
     public RegisterPage(Page page) {
         super(page);
@@ -46,15 +45,10 @@ public class RegisterPage extends BasePage {
         return this;
     }
 
-    // After pressing Register the shop shows the result on the SAME page, so we return this page.
-    public RegisterPage submit() {
+    // After pressing Register the shop opens a separate "registration completed" page,
+    // so we return its Page Object (the user is on a different page now).
+    public RegistrationResultPage submit() {
         click(REGISTER_BUTTON);
-        return this;
-    }
-
-    // The message after registering, for example "Your registration completed".
-    // innerText waits until the message appears on the page.
-    public String getResultMessage() {
-        return getText(RESULT_MESSAGE);
+        return new RegistrationResultPage(page);
     }
 }

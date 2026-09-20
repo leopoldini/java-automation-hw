@@ -28,7 +28,7 @@ public abstract class BaseUiTest {
         ConfigManager config = ConfigManager.getInstance();
 
         playwright = Playwright.create();
-        // headless comes from the config, so -Dui.headless=false shows the window without editing code
+        // headless comes from the config, so the VM option -Dheadless=false shows the window without editing code
         browser = playwright.chromium().launch(
                 new BrowserType.LaunchOptions().setHeadless(config.isHeadless()));
         page = browser.newPage();

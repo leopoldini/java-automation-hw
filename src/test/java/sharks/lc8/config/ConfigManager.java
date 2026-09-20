@@ -73,8 +73,10 @@ public final class ConfigManager {
         return get("api.base.url");
     }
 
+    // "baseUrl" and "headless" are the same keys the older lecture (lc5) uses,
+    // so the address and the mode are stored once and not duplicated in the file.
     public String getUiBaseUrl() {
-        return get("ui.base.url");
+        return get("baseUrl");
     }
 
     public String getLocalization() {
@@ -90,7 +92,7 @@ public final class ConfigManager {
     }
 
     public boolean isHeadless() {
-        return getBoolean("ui.headless", true);
+        return getBoolean("headless", true);
     }
 
     public int getTimeout() {

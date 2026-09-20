@@ -36,8 +36,8 @@ public class ShopUiFacade {
         email = generateEmail();
         password = config.getDefaultPassword();
 
-        // Fluent across three page objects: HomePage -> RegisterPage -> result message.
-        // openRegisterPage() returns RegisterPage, that is what keeps the chain going.
+        // Fluent across three page objects: HomePage -> RegisterPage -> RegistrationResultPage.
+        // Every method returns the page object where the user is now, that is what keeps the chain going.
         String result = new HomePage(page)
                 .openRegisterPage()
                 .selectMaleGender()

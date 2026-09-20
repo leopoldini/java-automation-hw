@@ -20,8 +20,4 @@ public class PromocodeResponseDto {
 
     @JsonProperty("reason")
     private String reason;
-
-    // Part of what the server returns. Our current tests don't check it.
-    @JsonProperty("includesDepositPromotions")
-    private boolean includesDepositPromotions;
 }

@@ -17,12 +17,6 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserResponseDto {
 
-    @JsonProperty("id")
-    private Long id;
-
-    @JsonProperty("email")
-    private String email;
-
     // Goes into the authorization header of the next requests
     @JsonProperty("token")
     private String token;
