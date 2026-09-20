@@ -6,8 +6,15 @@ import org.testng.Assert;
 import sharks.lc8.config.ConfigManager;
 import sharks.lc8.pages.HomePage;
 
+/**
+ * Same Facade + Fluent idea as AuthApiFacade, but for the browser.
+ * The facade drives the page objects, so the test never knows which button sits on which page.
+ *
+ * Keeps the registered email and password, so a later step can log in as that same user.
+ */
 public class ShopUiFacade {
 
+    // Page comes from the test - the facade does not open or close the browser
     private final Page page;
     private final ConfigManager config = ConfigManager.getInstance();
 
@@ -29,6 +36,8 @@ public class ShopUiFacade {
         email = generateEmail();
         password = config.getDefaultPassword();
 
+        // Fluent across three page objects: HomePage -> RegisterPage -> result message.
+        // openRegisterPage() returns RegisterPage, that is what keeps the chain going.
         String result = new HomePage(page)
                 .openRegisterPage()
                 .selectMaleGender()
@@ -52,6 +61,7 @@ public class ShopUiFacade {
 
     @Step("Login with registered user")
     public ShopUiFacade loginAsRegisteredUser() {
+        // Clear message instead of a null password if the steps are chained in a wrong order
         Assert.assertNotNull(email, "User must be registered before login");
 
         boolean loggedIn = new HomePage(page)
@@ -71,6 +81,8 @@ public class ShopUiFacade {
                 .openLoginPage()
                 .fillEmail("no_such_user_" + System.currentTimeMillis() + "@test.com")
                 .fillPassword("WrongPassword1!")
+                // submitExpectingFailure returns LoginPage, submit returns HomePage -
+                // the return type shows where the user actually ends up
                 .submitExpectingFailure()
                 .hasValidationError();
 
@@ -78,16 +90,7 @@ public class ShopUiFacade {
         return this;
     }
 
-    @Step("Search for product")
-    public ShopUiFacade searchProduct(String query) {
-        new HomePage(page).searchFor(query);
-        return this;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
+    // New email every run - the shop refuses an address that is already registered
     private String generateEmail() {
         return "leonid" + System.currentTimeMillis() + "@testmail.com";
     }

@@ -2,6 +2,7 @@ package sharks.lc8.pages;
 
 import com.microsoft.playwright.Page;
 
+/* registration form (gender, names, e-mail, passwords, Register button). See BasePage for the Page Object idea. */
 public class RegisterPage extends BasePage {
 
     private static final String GENDER_MALE = "#gender-male";
@@ -12,7 +13,6 @@ public class RegisterPage extends BasePage {
     private static final String CONFIRM_PASSWORD = "#ConfirmPassword";
     private static final String REGISTER_BUTTON = "#register-button";
     private static final String RESULT_MESSAGE = ".result";
-    private static final String CONTINUE_BUTTON = "input.button-1.register-continue-button";
 
     public RegisterPage(Page page) {
         super(page);
@@ -38,22 +38,22 @@ public class RegisterPage extends BasePage {
         return this;
     }
 
+    // The form has TWO password fields (password + confirm) and they must match,
+    // so one method fills both.
     public RegisterPage fillPassword(String password) {
         type(PASSWORD, password);
         type(CONFIRM_PASSWORD, password);
         return this;
     }
 
+    // After pressing Register the shop shows the result on the SAME page, so we return this page.
     public RegisterPage submit() {
         click(REGISTER_BUTTON);
         return this;
     }
 
-    public HomePage continueAfterRegistration() {
-        click(CONTINUE_BUTTON);
-        return new HomePage(page);
-    }
-
+    // The message after registering, for example "Your registration completed".
+    // innerText waits until the message appears on the page.
     public String getResultMessage() {
         return getText(RESULT_MESSAGE);
     }

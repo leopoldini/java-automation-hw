@@ -2,14 +2,20 @@ package sharks.lc8.pages;
 
 import com.microsoft.playwright.Page;
 
+/**
+ * Home page - only the top links are used: Register, Log in, Log out.
+ *
+ * Rule that makes the chains work:
+ *  - action moves to another page -> return that page (openLoginPage returns LoginPage)
+ *  - user stays here -> return this
+ * So the return type always shows where you actually are.
+ */
 public class HomePage extends BasePage {
 
+    // Selectors as constants at the top: if the site changes, this is the only place to fix
     private static final String REGISTER_LINK = "a.ico-register";
     private static final String LOGIN_LINK = "a.ico-login";
     private static final String LOGOUT_LINK = "a.ico-logout";
-    private static final String ACCOUNT_LINK = "a.account";
-    private static final String SEARCH_INPUT = "#small-searchterms";
-    private static final String SEARCH_BUTTON = "input.button-1.search-box-button";
 
     public HomePage(Page page) {
         super(page);
@@ -30,17 +36,8 @@ public class HomePage extends BasePage {
         return this;
     }
 
-    public HomePage searchFor(String query) {
-        type(SEARCH_INPUT, query);
-        click(SEARCH_BUTTON);
-        return this;
-    }
-
+    // The Log out link only exists for a logged-in user, so its presence is the check itself
     public boolean isUserLoggedIn() {
         return isVisible(LOGOUT_LINK);
-    }
-
-    public String getAccountName() {
-        return getText(ACCOUNT_LINK);
     }
 }

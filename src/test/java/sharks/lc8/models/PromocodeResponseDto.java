@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+/*
+ server's answer to "activate promocode".
+ "status" says whether the code was accepted, "reason" says why it was refused.
+ (What the annotations mean is explained in AuthResponseDto.)
+ */
 @Getter
-@Setter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PromocodeResponseDto {
@@ -18,6 +21,7 @@ public class PromocodeResponseDto {
     @JsonProperty("reason")
     private String reason;
 
+    // Part of what the server returns. Our current tests don't check it.
     @JsonProperty("includesDepositPromotions")
     private boolean includesDepositPromotions;
 }
