@@ -8,33 +8,34 @@ import io.restassured.specification.RequestSpecification;
 import sharks.lc8.config.ConfigManager;
 
 /**
- * Fluent for the API: the spec is assembled by a chain of RequestSpecBuilder calls.
- * Without it the same four lines would be copied into every request in SlotCityApiClient.
- * final + private constructor + static methods = a tools-only class, it holds no data,
- * so there is nothing to create.
+ * Общие настройки для всех API-запросов (адрес, JSON, язык, логирование), чтобы не повторять их в каждом запросе.
+ * Fluent: настройки собираются цепочкой вызовов RequestSpecBuilder через точку.
+ * Utility class: final + private конструктор + только static методы. Данных нет, объекты не нужны (как у Math).
  */
 public final class ApiSpecs {
 
-    // Base url comes from the Singleton, never hardcoded in the client
+    // Настройки берём из Singleton: адрес нигде не захардкожен, он лежит в config.properties.
+    // static: static методы работают только со static полями.
     private static final ConfigManager CONFIG = ConfigManager.getInstance();
 
+    // private: объекты этого класса не нужны
     private ApiSpecs() {
     }
 
+    // "Обычный бланк": для запросов без токена (register, login, guestSession)
     public static RequestSpecification base() {
         return new RequestSpecBuilder()
                 .setBaseUri(CONFIG.getApiBaseUrl())
                 .setContentType(ContentType.JSON)
                 .addHeader("localization", CONFIG.getLocalization())
-                // Filters, not .log() - a request spec cannot log the response,
-                // and without the response in the console nothing is debuggable
+                // Фильтры, а не .log(): печатают и запрос, и ответ. Без ответа в консоли упавший тест не разобрать.
                 .addFilter(new RequestLoggingFilter())
                 .addFilter(new ResponseLoggingFilter())
                 .build();
     }
 
-    // Reuses base() instead of repeating it, so both kinds of request go to the same host
-    // with the same headers
+    // "Бланк с подписью": всё из base() + токен. Для запросов залогиненного пользователя (activatePromocode).
+    // Токен приходит при регистрации или логине, AuthApiFacade хранит его и передаёт сюда через SlotCityApiClient.
     public static RequestSpecification authorized(String token) {
         return new RequestSpecBuilder()
                 .addRequestSpecification(base())

@@ -4,49 +4,61 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-
+// Singleton: читает config.properties один раз и раздаёт настройки всем классам.
+// final у класса: от него нельзя наследоваться.
 public final class ConfigManager {
 
+    // Только имя файла. final у поля: значение нельзя поменять. Заглавные буквы = константа.
     private static final String CONFIG_FILE = "config.properties";
 
-    // volatile = all threads see the newest value (needed for the check inside getInstance)
+    // Хранилище единственного объекта (сначала null).
+    // volatile: все потоки видят свежее значение.
     private static volatile ConfigManager instance;
 
+    // Таблица "ключ = значение", заполняется в конструкторе.
     private final Properties properties = new Properties();
 
-    // private constructor = "new ConfigManager()" is impossible. File is loaded here, once.
+    // private: снаружи new ConfigManager() нельзя. Файл читается здесь, один раз.
     private ConfigManager() {
-        // try (...) closes the stream automatically
+        // try (...) сам закроет поток после чтения (замена finally { input.close(); }).
+        // getResourceAsStream ищет файл по имени в src/test/resources и открывает его как поток байтов.
         try (InputStream input = ConfigManager.class
                 .getClassLoader()
                 .getResourceAsStream(CONFIG_FILE)) {
 
-            // missing file gives null, not an exception - so check it myself
+            // input == null -> ФАЙЛА нет (не путать с instance == null -> объекта нет).
+            // Вернётся null, а не ошибка, поэтому падаем сразу с понятным текстом.
             if (input == null) {
                 throw new IllegalStateException(
                         "File " + CONFIG_FILE + " not found in classpath (src/test/resources)");
             }
+            // Переписываем все строки "ключ=значение" из файла в таблицу properties
             properties.load(input);
         } catch (IOException e) {
+            // Файл есть, но прочитать не удалось. Unchecked: вызывающим не нужен свой try-catch.
+            // e передаём дальше, чтобы настоящая причина была видна в stack trace.
             throw new IllegalStateException("Failed to read " + CONFIG_FILE, e);
         }
     }
 
-    // Two null checks: first one is fast (object already exists), second one prevents
-    // two threads creating two objects at the same moment.
+    // Вход (static): вызывается через имя класса, потому что объекта ещё нет, а new запрещён.
     public static ConfigManager getInstance() {
+        // Проверка 1 (без замка) для скорости: объект уже есть -> сразу отдаём его.
         if (instance == null) {
+            // Замок: внутрь входит только один поток, остальные ждут у двери.
             synchronized (ConfigManager.class) {
+                // Проверка 2 (под замком): поток, который ждал, не создаст второй объект.
                 if (instance == null) {
                     instance = new ConfigManager();
                 }
             }
         }
+        // Всегда возвращает один и тот же объект ConfigManager
         return instance;
     }
 
-    // -Dkey=value wins over the file, so a setting can be changed for one run without editing it.
-    // Missing key = fail now, instead of a null travelling through the code.
+    // Сначала смотрим -Dkey=value (параметр запуска), если его нет - берём значение из файла.
+    // Ключа нет нигде -> падаем сразу с понятным текстом, а не тащим null дальше по коду.
     public String get(String key) {
         String value = System.getProperty(key, properties.getProperty(key));
         if (value == null) {
@@ -55,11 +67,14 @@ public final class ConfigManager {
         return value;
     }
 
+    // Перегрузка (overloading): то же имя get, другие параметры.
+    // Ключа нет -> вернётся defaultValue, без ошибки.
     public String get(String key, String defaultValue) {
         return System.getProperty(key, properties.getProperty(key, defaultValue));
     }
 
-    // Properties file holds only text, so convert it here
+    // В файле всё хранится как текст: превращаем текст в true/false и в число.
+    // String.valueOf: значение по умолчанию тоже переводим в текст, потому что get() принимает только String.
     public boolean getBoolean(String key, boolean defaultValue) {
         return Boolean.parseBoolean(get(key, String.valueOf(defaultValue)));
     }
@@ -68,17 +83,18 @@ public final class ConfigManager {
         return Integer.parseInt(get(key, String.valueOf(defaultValue)));
     }
 
-    // Key names are written only here, so a typo cannot hide anywhere else
+    // Имена ключей написаны только здесь. Опечатку в имени метода IDEA покажет сразу,
+    // а опечатку в строке "api.base.url" увидим только при запуске (Key not found).
     public String getApiBaseUrl() {
         return get("api.base.url");
     }
 
-    // "baseUrl" and "headless" are the same keys the older lecture (lc5) uses,
-    // so the address and the mode are stored once and not duplicated in the file.
+    // Ключи baseUrl и headless общие со старой лекцией lc5, поэтому в файле они не дублируются.
     public String getUiBaseUrl() {
         return get("baseUrl");
     }
 
+    // Со значением по умолчанию: без этого ключа можно обойтись (так же у headless и timeout).
     public String getLocalization() {
         return get("api.localization", "ua");
     }
