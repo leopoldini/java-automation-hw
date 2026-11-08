@@ -6,18 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * The "user" object nested inside the register / login response.
- * Annotations are explained in AuthResponseDto.
- *
- * Only the fields I actually use are declared here - the server sends far more,
- * @JsonIgnoreProperties drops the rest.
+ * Вложенный объект "user" из ответа на регистрацию и логин. Аннотации объяснены в AuthResponseDto.
+ * Объявлены только нужные поля, остальные (их много) отбрасывает @JsonIgnoreProperties.
  */
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserResponseDto {
 
-    // Goes into the authorization header of the next requests
+    // Уходит в заголовок authorization следующих запросов (ApiSpecs.authorized)
     @JsonProperty("token")
     private String token;
 }

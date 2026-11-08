@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * Body of the login request. Separate class from RegisterRequestDto because login needs
- * fewer fields - no promokey, no is_accept.
+ * Тело запроса логина (request body). Аннотации - как в RegisterRequestDto.
+ * Отдельный класс, потому что логину нужно меньше полей: нет promokey и is_accept.
  */
 @Getter
 @Builder
@@ -22,13 +22,12 @@ public class LoginRequestDto {
     @JsonProperty("password")
     private final String password;
 
-    // Nested DTO instead of a Map - this is what the reviewer asked for in lecture 6
+    // Вложенный DTO вместо Map - так попросил ревьюер в лекции 6
     @JsonProperty("device")
     @Builder.Default
     private final DeviceDto device = DeviceDto.builder().build();
 
-    // UserDto is my own test data, this class is the server's format.
-    // Keeping them apart means a change in the API touches only this class.
+    // Превращает UserDto (мои тестовые данные) в формат сервера
     public static LoginRequestDto from(UserDto user) {
         return LoginRequestDto.builder()
                 .type(user.getType())

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
-/*request for "activate promocode". Only one field: {"code": "..."}. */
+/* Тело запроса "активировать промокод". Одно поле: {"code": "..."}. */
 @Getter
 @Builder
 public class PromocodeRequestDto {

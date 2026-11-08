@@ -5,14 +5,18 @@ import lombok.Builder;
 import lombok.Getter;
 
 /*
- Body of the register request. Jackson turns this object into the JSON the server expects.
- Builder done by Lombok here - UserDto has the same pattern written by hand, so both
- final fields = once the request is built it cannot be changed.
+ Тело запроса регистрации (request body): то, что МЫ отправляем.
+ Jackson превращает объект в JSON (сериализация).
+ Builder здесь от Lombok (в UserDto такой же, но написан вручную и с проверкой).
+ Поля final: собранный запрос уже не меняется.
  */
-@Getter
-@Builder
+@Getter   // Lombok: геттеры для всех полей
+@Builder  // Lombok: Builder без проверки
 public class RegisterRequestDto {
 
+    // @JsonProperty: под каким именем поле идёт в JSON.
+    // @Builder.Default: значение по умолчанию, которое можно поменять через Builder.
+    // Без неё from() не скомпилируется: у Builder не будет метода type().
     @JsonProperty("type")
     @Builder.Default
     private final String type = "email";
@@ -23,23 +27,24 @@ public class RegisterRequestDto {
     @JsonProperty("password")
     private final String password;
 
-    // Required by the server, irrelevant for the tests - hence fixed defaults
+    // Сервер требует это поле, тестам оно не нужно - поэтому пустая строка по умолчанию
     @JsonProperty("promokey")
     @Builder.Default
     private final String promokey = "";
 
-    // Number 1, not true - that is what the server expects for "terms accepted"
+    // Сервер ждёт число 1, а не true ("согласен с условиями").
+    // В Java имя isAccept (camelCase), в JSON - is_accept (snake_case).
     @JsonProperty("is_accept")
     @Builder.Default
     private final int isAccept = 1;
 
-    // Nested DTO instead of a Map - this is what the reviewer asked for in lecture 6
+    // Вложенный DTO вместо Map - так попросил ревьюер в лекции 6: у полей есть типы, IDEA видит опечатки
     @JsonProperty("device")
     @Builder.Default
     private final DeviceDto device = DeviceDto.builder().build();
 
-    // UserDto is my own test data, this class is the server's format.
-    // Keeping them apart means a change in the API touches only this class.
+    // Превращает UserDto (мои тестовые данные) в формат сервера.
+    // Поменяется API -> правлю только этот класс, UserDto и тесты не трогаю.
     public static RegisterRequestDto from(UserDto user) {
         return RegisterRequestDto.builder()
                 .type(user.getType())

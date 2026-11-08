@@ -6,9 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /*
- server's answer to "activate promocode".
- "status" says whether the code was accepted, "reason" says why it was refused.
- (What the annotations mean is explained in AuthResponseDto.)
+ Ответ сервера на "активировать промокод". Аннотации объяснены в AuthResponseDto.
+ status - принят ли код, reason - почему отказ (например, "expired promocode").
  */
 @Getter
 @NoArgsConstructor

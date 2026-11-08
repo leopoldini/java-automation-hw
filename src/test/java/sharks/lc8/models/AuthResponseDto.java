@@ -6,28 +6,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- Response DTO: the server answer to register / login.
- response.as(AuthResponseDto.class) turns the JSON into this object, so the facade can write
- auth.getUser().getToken() instead of digging through raw text.
- Why these annotations (same set on every *ResponseDto):
- *  @NoArgsConstructor - Jackson creates an empty object first, then fills the fields
- *  @JsonIgnoreProperties - the real response has dozens of fields; without this Jackson fails
- *  on the first one that is not declared here
- *  @Getter, no setters - these values are only read; @JsonProperty on a private field is enough
- *                        for Jackson to write into it
+ * Тело ответа (response body) на регистрацию и логин: то, что сервер ответил НАМ.
+ * response.as(AuthResponseDto.class) превращает JSON в объект (десериализация),
+ * поэтому фасад пишет auth.getUser().getToken(), а не ищет токен в тексте.
+ * Аннотации (одинаковые во всех *ResponseDto):
+ *  @NoArgsConstructor - Jackson сначала создаёт пустой объект, потом заполняет поля
+ *  @JsonIgnoreProperties - в ответе десятки полей, без неё Jackson упадёт на первом неизвестном
+ *  @Getter без сеттеров - значения только читаем; в private поле Jackson пишет сам по @JsonProperty
  *
- * Request DTOs use @Builder instead - we build those ourselves, Jackson builds these.
+ * Request DTO используют @Builder: их собираем мы, а response DTO собирает Jackson.
  */
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthResponseDto {
 
-    // This API returns HTTP 200 even on failure, so this flag is the real result
+    // API возвращает HTTP 200 даже при ошибке, поэтому настоящий результат - это поле status
     @JsonProperty("status")
     private boolean status;
 
-    // Holds the token used by the next requests
+    // Внутри лежит токен для следующих запросов
     @JsonProperty("user")
     private UserResponseDto user;
 }
