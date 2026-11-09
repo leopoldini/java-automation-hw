@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tests for the Decorator. No real server: a fake client goes inside the decorator, so what is tested is only the decorator's own job - delegate, log, shorten long bodies, rethrow errors.
- * Wrapping a fake at all is only possible because both implement ApiClient. That is the pattern itelf, proven by the test.
+ * Тесты декоратора без сервера: внутрь обёртки кладём FakeApiClient, поэтому проверяется только работа
+ * самой обёртки - передать вызов, записать лог, сократить длинное тело, не спрятать ошибку.
+ * Без интернета - безопасно запускать вживую.
+ * Обернуть фальшивый клиент можно только потому, что оба реализуют ApiClient - это и есть паттерн.
  */
 public class DecoratorTest {
 
@@ -30,7 +32,8 @@ public class DecoratorTest {
     private PrintStream originalOut;
     private ByteArrayOutputStream console;
 
-    // The decorator logs to System.out, so redirect the console into a buffer the test can read
+    // Обёртка пишет логи в System.out, поэтому перед каждым тестом перенаправляем консоль
+    // в буфер, который тест может прочитать
     @BeforeMethod
     public void captureConsole() {
         originalOut = System.out;
@@ -38,7 +41,7 @@ public class DecoratorTest {
         System.setOut(new PrintStream(console, true, StandardCharsets.UTF_8));
     }
 
-    // alwaysRun: the console must be restored even if the test failed, or the next tests go silent
+    // alwaysRun: вернуть консоль даже после упавшего теста, иначе следующие тесты "замолчат"
     @AfterMethod(alwaysRun = true)
     public void restoreConsole() {
         System.setOut(originalOut);
@@ -52,9 +55,9 @@ public class DecoratorTest {
 
         Response actual = decorated.login(USER);
 
-        // assertSame, not assertEquals: literally the same object, the decorator changes nothing
+        // assertSame, а не assertEquals: это тот же самый объект, обёртка ничего не поменяла
         Assert.assertSame(actual, expected, "Decorator must return the wrapped client's response");
-        // And the call really reached the wrapped client, exactly once
+        // И вызов действительно дошёл до клиента внутри, ровно один раз
         Assert.assertEquals(fake.calls, List.of("login"));
     }
 
@@ -64,7 +67,7 @@ public class DecoratorTest {
 
         decorated.register(USER);
 
-        // Both arrows must be there: the "before" and the "after" part of the decorator
+        // Должны быть обе стрелки: часть обёртки "до" запроса и часть "после"
         String log = console.toString(StandardCharsets.UTF_8);
         Assert.assertTrue(log.contains("[API] ---> register"), log);
         Assert.assertTrue(log.contains("[API] <--- register"), log);
@@ -89,21 +92,22 @@ public class DecoratorTest {
         FakeApiClient fake = new FakeApiClient(new IllegalStateException("server is down"));
         ApiClient decorated = new LoggingApiClient(fake);
 
+        // try/catch, а не expectedExceptions: после исключения нужно ещё проверить лог
         try {
             decorated.login(USER);
-            // Reaching this line means the decorator swallowed the error - a bug
+            // Дошли до этой строки = обёртка спрятала ошибку = баг
             Assert.fail("Exception from the wrapped client must not be swallowed");
         } catch (IllegalStateException expected) {
             Assert.assertEquals(expected.getMessage(), "server is down");
         }
 
-        // Logged first, then rethrown: a failed call must not disappear from the log
+        // Сначала записали в лог, потом бросили дальше: упавший вызов не должен пропасть из лога
         String log = console.toString(StandardCharsets.UTF_8);
         Assert.assertTrue(log.contains("FAILED"), log);
         Assert.assertTrue(log.contains("server is down"), log);
     }
 
-    // A prepared response without sending anything over the network
+    // Готовый ответ без отправки по сети
     private static Response response(int statusCode, String body) {
         return new ResponseBuilder()
                 .setStatusCode(statusCode)
@@ -112,8 +116,9 @@ public class DecoratorTest {
     }
 
     /**
-     * Hand-written fake instead of the real client: returns a prepared response (or throws a
-     * prepared error) and records which methods were called. No network, no mocking library.
+     * Фальшивый клиент вместо настоящего: возвращает заготовленный ответ (или бросает заготовленную
+     * ошибку) и записывает, какие методы вызывали. Без сети и без библиотек вроде Mockito.
+     * Два конструктора с разными параметрами - перегрузка.
      */
     private static class FakeApiClient implements ApiClient {
 
@@ -151,7 +156,7 @@ public class DecoratorTest {
             return answer("activatePromocode");
         }
 
-        // Same for every method: record the call, then fail or return the prepared response
+        // Для всех методов одинаково: записать вызов, потом бросить ошибку или вернуть ответ
         private Response answer(String method) {
             calls.add(method);
             if (failure != null) {

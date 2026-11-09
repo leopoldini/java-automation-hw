@@ -6,37 +6,33 @@ import sharks.lc8.models.UserDto;
 import java.util.function.Supplier;
 
 /**
- * WHAT IT IS: a "wrapper" around another ApiClient that prints a log line before and after
- * every request.
+ * Обёртка вокруг другого ApiClient: пишет строку лога до и после каждого запроса.
  *
- * PATTERN: Decorator = "wrap an object to add a new ability, without changing the object itself".
- * Like putting a phone in a case: the phone works the same, the case just adds something
- * (protection). Here the "phone" is the real client and the "case" is the logging.
+ * Паттерн Decorator: обернуть объект, чтобы добавить новую возможность, не меняя сам объект.
+ * Как чехол на телефон: телефон работает так же, чехол добавляет защиту.
+ * Здесь "телефон" - настоящий клиент, "чехол" - логи.
  *
- * HOW IT WORKS: this class has the SAME menu (ApiClient) as the real client, so the code that
- * uses it can't tell the difference. Each method does 3 things:
- *   1. prints "I'm starting this request";
- *   2. passes the work to the wrapped client (the "delegate");
- *   3. prints the result and returns the answer untouched.
+ * То же "меню" (ApiClient), что у настоящего клиента, поэтому код снаружи не замечает разницы.
+ * Каждый метод: 1) пишет "начинаю запрос"; 2) передаёт работу клиенту внутри (delegate);
+ * 3) пишет результат и возвращает ответ не тронутым.
  *
- * WHY NOT JUST PUT println INTO SlotCityApiClient: then the real client would be mixed with
- * logging code, and we couldn't switch logs off. With a wrapper, logs are optional:
- *   new LoggingApiClient(new SlotCityApiClient())   <- with logs
- *   new SlotCityApiClient()                         <- without logs
- *
- * SAY IT IN DEFENCE: "The decorator adds logging to any ApiClient without changing its code."
+ * Почему не println прямо в SlotCityApiClient: клиент смешался бы с логами, и их нельзя было бы выключить.
+ *   new LoggingApiClient(new SlotCityApiClient())   <- с логами
+ *   new SlotCityApiClient()                         <- без логов
+ * Сейчас используется только в DecoratorTest: в API-тестах запросы и ответы уже логируют фильтры ApiSpecs.
  */
 public class LoggingApiClient implements ApiClient {
 
-    // The client we wrap. It does the real work.
+    // Клиент внутри обёртки, делает настоящую работу.
+    // Тип ApiClient: обернуть можно любой клиент (в DecoratorTest - FakeApiClient).
     private final ApiClient delegate;
 
     public LoggingApiClient(ApiClient delegate) {
         this.delegate = delegate;
     }
 
-    // The four methods below only say WHICH request to run.
-    // The logging itself is written once, in logged() at the bottom.
+    // Четыре метода только говорят, КАКОЙ запрос выполнить. Сами логи написаны один раз, в logged().
+    // () -> ... = лямбда: кусок кода-параметр, выполнится позже, внутри logged().
     @Override
     public Response register(UserDto user) {
         return logged("register", () -> delegate.register(user));
@@ -47,6 +43,7 @@ public class LoggingApiClient implements ApiClient {
         return logged("login", () -> delegate.login(user));
     }
 
+    // delegate::guestSession - короткая запись лямбды () -> delegate.guestSession()
     @Override
     public Response guestSession() {
         return logged("guestSession", delegate::guestSession);
@@ -58,15 +55,15 @@ public class LoggingApiClient implements ApiClient {
     }
 
     /**
-     * The shared logging code, so we don't copy-paste it four times.
-     * "call" is a piece of code passed in as a parameter (a lambda): "run THIS request and
-     * give me its Response". That way this method doesn't care which request it is timing.
+     * Общий код логов, чтобы не копировать его четыре раза.
+     * call - лямбда "выполни ЭТОТ запрос и дай Response" (Supplier = "поставщик").
      */
     private Response logged(String operation, Supplier<Response> call) {
         System.out.println("[API] ---> " + operation);
         long start = System.currentTimeMillis();
 
         try {
+            // Здесь выполняется лямбда = настоящий запрос через delegate
             Response response = call.get();
             long duration = System.currentTimeMillis() - start;
 
@@ -76,8 +73,7 @@ public class LoggingApiClient implements ApiClient {
                     + " | body=" + shorten(response.asString()));
             return response;
         } catch (RuntimeException e) {
-            // Write the error to the log, then throw it again. A wrapper must never hide
-            // a problem from the caller.
+            // Пишем ошибку в лог и бросаем дальше: обёртка не должна прятать проблему от того, кто её вызвал.
             long duration = System.currentTimeMillis() - start;
             System.out.println("[API] <--- " + operation
                     + " | FAILED after " + duration + "ms"
@@ -86,7 +82,8 @@ public class LoggingApiClient implements ApiClient {
         }
     }
 
-    // A huge answer would flood the console, so we print only the first 200 characters.
+    // Огромный ответ залил бы консоль, поэтому печатаем только первые 200 символов.
+    // условие ? A : B = короткий if-else
     private String shorten(String body) {
         int limit = 200;
         return body.length() <= limit ? body : body.substring(0, limit) + "...";
