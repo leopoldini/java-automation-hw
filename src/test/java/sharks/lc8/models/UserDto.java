@@ -49,10 +49,11 @@ public final class UserDto {
     // static: Builder создаётся раньше пользователя, без объекта UserDto.
     public static final class Builder {
 
-        // Без final: поля заполняются по шагам. type по умолчанию "email".
+        // Без final: email и password заполняются по шагам.
         private String email;
         private String password;
-        private String type = "email";
+        // Тип входа всегда "email" (значение по умолчанию), другой тип тестам не нужен.
+        private final String type = "email";
 
         // private: Builder получают только через UserDto.builder()
         private Builder() {
@@ -66,11 +67,6 @@ public final class UserDto {
 
         public Builder password(String password) {
             this.password = password;
-            return this;
-        }
-
-        public Builder type(String type) {
-            this.type = type;
             return this;
         }
 
