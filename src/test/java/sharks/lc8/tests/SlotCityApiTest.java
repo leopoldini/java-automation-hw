@@ -3,8 +3,9 @@ package sharks.lc8.tests;
 import org.testng.annotations.Test;
 
 /*
- API tests. BaseApiTest hands each test a fresh auth facade, the asserts live inside the facade steps - so a test is just the chain of business steps.
- Four separate tests instead of one long end-to-end: each one checks a single thing, and a failure points straight at what broke.
+ API-тесты. extends BaseApiTest: наследуем поле auth и новый фасад перед каждым тестом.
+ Проверки живут внутри шагов фасада, поэтому тест - это просто цепочка бизнес-шагов.
+ Четыре отдельных теста вместо одного длинного: каждый проверяет одну вещь, и по упавшему сразу видно, что сломалось.
  */
 public class SlotCityApiTest extends BaseApiTest {
 
@@ -13,14 +14,14 @@ public class SlotCityApiTest extends BaseApiTest {
         auth.registerNewUser();
     }
 
-    // switchToGuest itself asserts that the guest token differs from the user one
+    // switchToGuest сам проверяет, что гостевой токен отличается от токена пользователя
     @Test
     public void shouldSwitchToGuestSession() {
         auth.registerNewUser()
                 .switchToGuest();
     }
 
-    // The account must survive the guest session - logging back in proves it
+    // Аккаунт должен пережить гостевую сессию: повторный логин это доказывает
     @Test
     public void shouldLoginAfterGuestSession() {
         auth.registerNewUser()
@@ -28,7 +29,8 @@ public class SlotCityApiTest extends BaseApiTest {
                 .loginAsCurrentUser();
     }
 
-    // A promocode needs a token, hence register -> log in -> activate
+    // Промокоду нужен токен, поэтому регистрация -> логин -> активация.
+    // Сейчас падает: промокод TESTKKTT2 на стенде истёк (status false, reason "expired promocode").
     @Test
     public void shouldActivatePromocode() {
         auth.registerNewUser()

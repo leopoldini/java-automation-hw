@@ -4,17 +4,18 @@ import org.testng.annotations.BeforeMethod;
 import sharks.lc8.facade.AuthApiFacade;
 
 /**
- * Parent of the API tests. Keeps the setup out of the tests themselves.
- * A fresh facade before every test on purpose: the facade remembers the current user and token,
- * and TestNG reuses one instance of a test class for all its methods - a shared facade would
- * leak one test's user into the next.
+ * Родитель API-тестов: подготовка вынесена из самих тестов.
+ * abstract: сам по себе не запускается, это только родитель для тестов.
+ * Новый фасад перед КАЖДЫМ тестом специально: фасад помнит пользователя и токен,
+ * а TestNG использует один объект тестового класса для всех его тестов -
+ * общий фасад передал бы пользователя одного теста в следующий.
  */
 public abstract class BaseApiTest {
 
-    // Used directly in the child tests: auth.registerNewUser()
+    // protected: доступен в тестах-наследниках, например auth.registerNewUser()
     protected AuthApiFacade auth;
 
-    // Runs before every @Test in the child classes
+    // Выполняется перед каждым @Test в классах-наследниках
     @BeforeMethod
     public void setUp() {
         auth = new AuthApiFacade();
