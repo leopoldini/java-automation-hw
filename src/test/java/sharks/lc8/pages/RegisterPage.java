@@ -2,7 +2,7 @@ package sharks.lc8.pages;
 
 import com.microsoft.playwright.Page;
 
-/* registration form (gender, names, e-mail, passwords, Register button). See BasePage for the Page Object idea. */
+/* Форма регистрации (пол, имя, фамилия, email, пароли, кнопка Register). Идея Page Object описана в BasePage. */
 public class RegisterPage extends BasePage {
 
     private static final String GENDER_MALE = "#gender-male";
@@ -37,16 +37,15 @@ public class RegisterPage extends BasePage {
         return this;
     }
 
-    // The form has TWO password fields (password + confirm) and they must match,
-    // so one method fills both.
+    // В форме ДВА поля пароля (пароль + подтверждение), они должны совпадать, поэтому один метод заполняет оба.
     public RegisterPage fillPassword(String password) {
         type(PASSWORD, password);
         type(CONFIRM_PASSWORD, password);
         return this;
     }
 
-    // After pressing Register the shop opens a separate "registration completed" page,
-    // so we return its Page Object (the user is on a different page now).
+    // После Register магазин открывает отдельную страницу "регистрация завершена",
+    // поэтому возвращаем её Page Object: пользователь теперь на другой странице.
     public RegistrationResultPage submit() {
         click(REGISTER_BUTTON);
         return new RegistrationResultPage(page);

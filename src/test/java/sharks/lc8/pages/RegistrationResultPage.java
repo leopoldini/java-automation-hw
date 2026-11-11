@@ -3,9 +3,8 @@ package sharks.lc8.pages;
 import com.microsoft.playwright.Page;
 
 /*
- The page the shop opens right after we press Register ("Your registration completed").
- It is a separate page with its own URL, so it gets its own Page Object.
- See BasePage for the Page Object idea.
+ Страница, которую магазин открывает сразу после Register ("Your registration completed").
+ Это отдельная страница со своим адресом, поэтому у неё свой Page Object. Идея Page Object описана в BasePage.
  */
 public class RegistrationResultPage extends BasePage {
 
@@ -15,8 +14,7 @@ public class RegistrationResultPage extends BasePage {
         super(page);
     }
 
-    // The message, for example "Your registration completed".
-    // innerText waits until the message appears on the page.
+    // Текст сообщения, например "Your registration completed". innerText ждёт, пока сообщение появится.
     public String getResultMessage() {
         return getText(RESULT_MESSAGE);
     }

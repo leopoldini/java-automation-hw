@@ -3,28 +3,32 @@ package sharks.lc8.pages;
 import com.microsoft.playwright.Page;
 
 /**
- * Page Object: one class per page, selectors and actions live there, tests never see them.
- * This parent holds the browser tab and the actions every page needs, so the child pages
- * do not repeat them. Adding waits or logging to every click would happen here, once.
+ * Page Object: один класс на одну страницу. Селекторы и действия живут в классе страницы, тесты их не видят.
+ * Этот родитель хранит вкладку браузера и действия, нужные каждой странице, чтобы страницы их не повторяли.
+ * Добавить ожидание или лог к каждому клику - здесь, в одном месте.
  *
- * abstract = only real pages (HomePage, LoginPage, RegisterPage) can be created.
+ * abstract: создать можно только настоящие страницы (HomePage, LoginPage...), new BasePage(page) не скомпилируется.
+ * Отличие от интерфейса: здесь есть код (поле page и готовые методы).
  */
 public abstract class BasePage {
 
-    // protected = child pages can use it, tests cannot.
-    // final + set in the constructor: in my lecture 5 pages this was a settable field and
-    // a forgotten page gave NullPointerException. Now a page without a tab cannot exist.
+    // Page - вкладка браузера (Playwright). protected: видят страницы-наследники, тесты не видят.
+    // final + задаётся в конструкторе: в лекции 5 поле задавали отдельно, забыли -> NullPointerException.
+    // Теперь страница без вкладки не может существовать.
     protected final Page page;
 
+    // protected: вызывают только наследники, через super(page)
     protected BasePage(Page page) {
         this.page = page;
     }
 
+    // Методы-помощники: обёртки над Playwright, общие для всех страниц.
+    // click, fill и innerText сами ждут элемент (auto-waiting), поэтому в коде нет sleep.
     protected void click(String selector) {
         page.click(selector);
     }
 
-    // fill() clears the field before typing
+    // fill() сначала очищает поле, потом вводит текст
     protected void type(String selector, String value) {
         page.fill(selector, value);
     }
@@ -33,8 +37,8 @@ public abstract class BasePage {
         return page.locator(selector).innerText();
     }
 
-    // isVisible() answers right now, it does not wait - only use it on a loaded page.
-    // first() = take the first match if the selector finds several elements.
+    // isVisible() НЕ ждёт, отвечает прямо сейчас - только для уже загруженной страницы.
+    // first() = взять первый элемент, если селектор нашёл несколько.
     protected boolean isVisible(String selector) {
         return page.locator(selector).first().isVisible();
     }
