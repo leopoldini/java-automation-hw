@@ -4,11 +4,11 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import sharks.lc8.config.ConfigManager;
 
-/* quick tests for the Singleton (ConfigManager). No internet needed. */
+/* Быстрые тесты для Singleton (ConfigManager). Интернет не нужен. */
 public class ConfigManagerTest {
 
-    // The heart of a Singleton: ask twice, get the SAME object.
-    // assertSame compares "is it the very same object", not "do they look alike".
+    // Главное в Singleton: дважды просим и получаем ТОТ ЖЕ объект.
+    // assertSame проверяет "тот же ли это объект", а assertEquals - "равны ли по содержимому".
     @Test
     public void shouldReturnSameInstance() {
         ConfigManager first = ConfigManager.getInstance();
@@ -16,7 +16,7 @@ public class ConfigManagerTest {
         Assert.assertSame(first, second);
     }
 
-    // Proves the config file (src/test/resources/config.properties) was really read.
+    // Доказывает, что файл config.properties действительно прочитан: значения совпадают с файлом
     @Test
     public void shouldReadPropertiesFromFile() {
         ConfigManager config = ConfigManager.getInstance();

@@ -6,18 +6,19 @@ import org.testng.Assert;
 import sharks.lc8.config.ConfigManager;
 import sharks.lc8.pages.HomePage;
 
-/**
- * Same Facade + Fluent idea as AuthApiFacade, but for the browser.
- * The facade drives the page objects, so the test never knows which button sits on which page.
- *
- * Keeps the registered email and password, so a later step can log in as that same user.
+/*
+ Facade + Fluent, как AuthApiFacade, только для браузера.
+ Тест вызывает понятные шаги (openShop, registerNewUser, logout, loginAsRegisteredUser),
+ а Page Objects, селекторы и проверки спрятаны внутри.
+ Помнит email и пароль между шагами, чтобы потом войти этим же пользователем.
  */
 public class ShopUiFacade {
 
-    // Page comes from the test - the facade does not open or close the browser
+    // Вкладку даёт тест (её открыл BaseUiTest): фасад сам браузер не открывает и не закрывает
     private final Page page;
     private final ConfigManager config = ConfigManager.getInstance();
 
+    // Состояние между шагами: данные зарегистрированного пользователя
     private String email;
     private String password;
 
@@ -25,8 +26,10 @@ public class ShopUiFacade {
         this.page = page;
     }
 
+    // @Step = название шага в отчёте Allure
     @Step("Open shop home page")
     public ShopUiFacade openShop() {
+        // Адрес магазина из config.properties (ключ baseUrl)
         page.navigate(config.getUiBaseUrl());
         return this;
     }
@@ -36,8 +39,8 @@ public class ShopUiFacade {
         email = generateEmail();
         password = config.getDefaultPassword();
 
-        // Fluent across three page objects: HomePage -> RegisterPage -> RegistrationResultPage.
-        // Every method returns the page object where the user is now, that is what keeps the chain going.
+        // Цепочка через три страницы: HomePage -> RegisterPage -> RegistrationResultPage.
+        // Каждый метод возвращает страницу, на которой пользователь сейчас, поэтому цепочка не рвётся.
         String result = new HomePage(page)
                 .openRegisterPage()
                 .selectMaleGender()
@@ -48,6 +51,7 @@ public class ShopUiFacade {
                 .submit()
                 .getResultMessage();
 
+        // Страница только сообщает текст, а правильный ли он, решает фасад
         Assert.assertTrue(result.contains("Your registration completed"),
                 "Registration result: " + result);
         return this;
@@ -61,7 +65,7 @@ public class ShopUiFacade {
 
     @Step("Login with registered user")
     public ShopUiFacade loginAsRegisteredUser() {
-        // Clear message instead of a null password if the steps are chained in a wrong order
+        // Логин до регистрации (шаги в неверном порядке) -> сразу понятная ошибка, а не null вместо email
         Assert.assertNotNull(email, "User must be registered before login");
 
         boolean loggedIn = new HomePage(page)
@@ -69,6 +73,7 @@ public class ShopUiFacade {
                 .fillEmail(email)
                 .fillPassword(password)
                 .submit()
+                // Страница сообщает true или false, а проверяет фасад
                 .isUserLoggedIn();
 
         Assert.assertTrue(loggedIn, "User should be logged in");
@@ -79,10 +84,11 @@ public class ShopUiFacade {
     public ShopUiFacade loginWithInvalidCredentials() {
         boolean hasError = new HomePage(page)
                 .openLoginPage()
+                // Такого пользователя точно нет: время в миллисекундах каждый раз новое
                 .fillEmail("no_such_user_" + System.currentTimeMillis() + "@test.com")
                 .fillPassword("WrongPassword1!")
-                // submitExpectingFailure returns LoginPage, submit returns HomePage -
-                // the return type shows where the user actually ends up
+                // submitExpectingFailure() возвращает LoginPage, а submit() - HomePage:
+                // тип показывает, где пользователь оказался
                 .submitExpectingFailure()
                 .hasValidationError();
 
@@ -90,7 +96,7 @@ public class ShopUiFacade {
         return this;
     }
 
-    // New email every run - the shop refuses an address that is already registered
+    // Новый email каждый раз: уже зарегистрированный адрес магазин не примет
     private String generateEmail() {
         return "leonid" + System.currentTimeMillis() + "@testmail.com";
     }

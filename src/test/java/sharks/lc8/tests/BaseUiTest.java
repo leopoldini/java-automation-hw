@@ -9,37 +9,40 @@ import org.testng.annotations.BeforeMethod;
 import sharks.lc8.config.ConfigManager;
 
 /*
- Parent of the UI tests: opens a browser before every test and closes it after.
- A child class just extends it and gets a ready tab called page.
- abstract = no tests of its own, it only exists to be inherited.
+ Родитель UI-тестов: открывает браузер перед каждым тестом и закрывает после.
+ Тест пишет extends BaseUiTest и получает готовую вкладку page.
+ abstract: сам по себе не запускается, это только родитель для тестов.
  */
 public abstract class BaseUiTest {
 
-    // protected = the child tests work with this tab
+    // protected: доступна в тестах-наследниках, например new ShopUiFacade(page)
     protected Page page;
 
-    // Kept only so tearDown can close them, the tests never touch them
+    // Хранятся только чтобы закрыть их в tearDown, тесты их не трогают
     private Playwright playwright;
     private Browser browser;
 
-    // Before every @Test, so each test starts with a clean browser - no cookies from the previous one
+    // Новый браузер перед КАЖДЫМ @Test: тест начинается без cookies от предыдущего.
+    // Минус - медленнее. Быстрее: один браузер и новый BrowserContext (чистый профиль) на каждый тест.
     @BeforeMethod
     public void setUp() {
         ConfigManager config = ConfigManager.getInstance();
 
         playwright = Playwright.create();
-        // headless comes from the config, so the VM option -Dheadless=false shows the window without editing code
+        // headless=true - без окна (быстрее, так работает CI), false - с окном.
+        // Меняется в config.properties: -Dheadless=false до тестов не дойдёт, build.gradle не передаёт -D.
         browser = playwright.chromium().launch(
                 new BrowserType.LaunchOptions().setHeadless(config.isHeadless()));
         page = browser.newPage();
-        // How long Playwright waits for an element before failing
+        // Сколько миллисекунд Playwright ждёт элемент, прежде чем упасть (ui.timeout в config.properties)
         page.setDefaultTimeout(config.getTimeout());
     }
 
-    @AfterMethod
+    // alwaysRun = true: tearDown выполнится, даже если setUp упал посередине.
+    // Без него TestNG пропустил бы tearDown, и браузер остался бы висеть в фоне.
+    @AfterMethod(alwaysRun = true)
     public void tearDown() {
-        // Null checks in case setUp broke halfway and these were never created.
-        // Without closing, browser processes would pile up in the background.
+        // setUp упал раньше, чем браузер создался -> тут null, и close() дал бы NullPointerException
         if (browser != null) {
             browser.close();
         }
