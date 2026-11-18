@@ -76,7 +76,7 @@ public class WebShopFrameworkTests extends BaseTest {
         Assert.assertTrue(loginPage.getErrorMessage().contains(INVALID_LOGIN_MSG));
     }
 
-    @Test(dataProvider = "searchData", dataProviderClass = UserDataProvider.class)
+    @Test(dataProvider = "searchProducts", dataProviderClass = UserDataProvider.class)
     @Story("Catalog Search")
     @Description("Verify catalog product search functionality")
     public void testSearchProducts(String productName) {
