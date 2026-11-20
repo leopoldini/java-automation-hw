@@ -10,27 +10,27 @@ import sharks.lc8.specs.ApiSpecs;
 import static io.restassured.RestAssured.given;
 
 /**
- * WHAT IT IS: the REAL API client. It really sends HTTP requests to the SlotCity server,
- * using the RestAssured library.
+ * The real API client: sends HTTP requests to the SlotCity server with Rest Assured.
+ * The only class that knows the paths (/auth/login and so on): if a path changes, I fix it only here.
  *
- * WHY: this is the only class that knows the endpoint addresses (/auth/login etc.).
- * If an address changes, we fix it here and nowhere else.
- *
- * EVERY METHOD LOOKS THE SAME, read it like a sentence:
- *   given()   = "Given a prepared request" (common settings + body)
- *   when()    = "When I send it" (which method and which address)
- *   then().extract().response() = "Then give me the answer" (we only take it, we don't check it here)
+ * Every method reads like a sentence:
+ *   given()  = "given": shared settings (spec) + request body (body)
+ *   when()   = "when": HTTP method and path (post / get)
+ *   then().extract().response() = "then": just take the response, the checks are in the facade
  */
 public class SlotCityApiClient implements ApiClient {
 
+    // @Override: a method from the ApiClient "menu" - same name and parameters, but its own body (the real request).
+    // If I make a mistake in the name or parameters, IDEA shows an error.
     @Override
     public Response register(UserDto user) {
         return given()
                 .spec(ApiSpecs.base())
-                // We hand over a normal Java object and RestAssured turns it into JSON by itself.
-                // RegisterRequestDto.from(...) converts our simple UserDto into the format the server wants.
+                // We pass a plain Java object, Rest Assured turns it into JSON by itself (serialization).
+                // from() converts UserDto into the server format.
                 .body(RegisterRequestDto.from(user))
                 .when()
+                // Only the path: the server address is already in ApiSpecs.base()
                 .post("/auth/v2/register?on_device=true")
                 .then()
                 .extract()
@@ -49,6 +49,7 @@ public class SlotCityApiClient implements ApiClient {
                 .response();
     }
 
+    // GET and no body: nothing to send, we only get a guest token
     @Override
     public Response guestSession() {
         return given()
@@ -63,8 +64,7 @@ public class SlotCityApiClient implements ApiClient {
     @Override
     public Response activatePromocode(String token, String promocode) {
         return given()
-                // "authorized" = the usual settings + the token in the header,
-                // so the server knows WHICH user is asking.
+                // authorized = the usual settings + the token in a header: the server knows WHO activates the promocode
                 .spec(ApiSpecs.authorized(token))
                 .body(PromocodeRequestDto.builder().code(promocode).build())
                 .when()

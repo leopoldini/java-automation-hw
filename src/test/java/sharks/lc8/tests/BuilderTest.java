@@ -7,11 +7,11 @@ import sharks.lc8.models.RegisterRequestDto;
 import sharks.lc8.models.UserDto;
 
 /*
- Tests for both builders: the hand-written one in UserDto and the Lombok one in. RegisterRequestDto. No network here, so they run instantly.
+ Tests for both Builders: the manual one in UserDto and the Lombok one in RegisterRequestDto. No network, they run instantly.
  */
 public class BuilderTest {
 
-    // The value I set is kept, the one I skipped (type) falls back to its default
+    // A value we set is kept, a skipped one (type) comes from the default
     @Test
     public void shouldBuildUserWithManualBuilder() {
         UserDto user = UserDto.builder()
@@ -23,8 +23,8 @@ public class BuilderTest {
         Assert.assertEquals(user.getType(), "email");
     }
 
-    // The validation inside build() - passes only if that exact exception is thrown.
-    // This is the advantage of the hand-written builder: Lombok has no such check.
+    // The check in build(): the test is green only if exactly IllegalStateException is thrown.
+    // This is a plus of the manual Builder: Lombok has no such check.
     @Test(expectedExceptions = IllegalStateException.class)
     public void shouldFailWithoutPassword() {
         UserDto.builder()
@@ -32,9 +32,9 @@ public class BuilderTest {
                 .build();
     }
 
-    // The real point: the object must become the JSON the server expects.
-    // snake_case names come from @JsonProperty, the device values from @Builder.Default -
-    // if @Builder.Default were missing, the device fields would be null and this would fail.
+    // The main point: the object must turn into the JSON the server expects.
+    // The snake_case names come from @JsonProperty, the device values are the defaults in DeviceDto.
+    // throws Exception: writeValueAsString throws a checked exception, it must be declared or caught.
     @Test
     public void shouldSerializeLombokDtoToJson() throws Exception {
         UserDto user = UserDto.builder()
@@ -43,9 +43,10 @@ public class BuilderTest {
                 .build();
 
         RegisterRequestDto request = RegisterRequestDto.from(user);
+        // Jackson: object -> JSON text (serialization)
         String json = new ObjectMapper().writeValueAsString(request);
 
-        // json passed as the assert message: on failure the console shows the whole body
+        // json is the assert message: if the test fails, the whole JSON is visible in the console
         Assert.assertTrue(json.contains("\"is_accept\":1"), json);
         Assert.assertTrue(json.contains("\"device_id\""), json);
         Assert.assertTrue(json.contains("\"user_agent\""), json);

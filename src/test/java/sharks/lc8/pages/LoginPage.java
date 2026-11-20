@@ -2,7 +2,7 @@ package sharks.lc8.pages;
 
 import com.microsoft.playwright.Page;
 
-/* login form (e-mail, password, Log in button). See BasePage for the Page Object idea. */
+/* The login form (email, password, Log in button). The Page Object idea is described in BasePage. */
 public class LoginPage extends BasePage {
 
     private static final String EMAIL = "#Email";
@@ -24,19 +24,19 @@ public class LoginPage extends BasePage {
         return this;
     }
 
-    // Login SUCCEEDS: the shop sends us to the home page, so we return HomePage.
+    // Login SUCCEEDED: the shop redirects to the home page, so we return HomePage.
     public HomePage submit() {
         click(LOGIN_BUTTON);
         return new HomePage(page);
     }
 
-    // Login FAILS (wrong data): we stay on the login form, so we return this page.
+    // Login FAILED (wrong data): we stay on the form, so we return this same page.
     public LoginPage submitExpectingFailure() {
         click(LOGIN_BUTTON);
         return this;
     }
 
-    // The red error box that appears when the login data is wrong.
+    // The red error box that appears when the data is wrong
     public boolean hasValidationError() {
         return isVisible(VALIDATION_ERROR);
     }

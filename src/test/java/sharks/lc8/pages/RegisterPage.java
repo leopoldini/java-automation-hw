@@ -2,7 +2,7 @@ package sharks.lc8.pages;
 
 import com.microsoft.playwright.Page;
 
-/* registration form (gender, names, e-mail, passwords, Register button). See BasePage for the Page Object idea. */
+/* The register form (gender, first name, last name, email, passwords, Register button). The Page Object idea is described in BasePage. */
 public class RegisterPage extends BasePage {
 
     private static final String GENDER_MALE = "#gender-male";
@@ -37,16 +37,15 @@ public class RegisterPage extends BasePage {
         return this;
     }
 
-    // The form has TWO password fields (password + confirm) and they must match,
-    // so one method fills both.
+    // The form has TWO password fields (password + confirmation), they must match, so one method fills both.
     public RegisterPage fillPassword(String password) {
         type(PASSWORD, password);
         type(CONFIRM_PASSWORD, password);
         return this;
     }
 
-    // After pressing Register the shop opens a separate "registration completed" page,
-    // so we return its Page Object (the user is on a different page now).
+    // After Register the shop opens a separate "registration completed" page,
+    // so we return its Page Object: the user is on another page now.
     public RegistrationResultPage submit() {
         click(REGISTER_BUTTON);
         return new RegistrationResultPage(page);

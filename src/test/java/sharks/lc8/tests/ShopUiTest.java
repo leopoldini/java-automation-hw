@@ -4,7 +4,8 @@ import org.testng.annotations.Test;
 import sharks.lc8.facade.ShopUiFacade;
 
 /*
-UI tests. The browser comes from BaseUiTest, the steps from the facade - no selectors and no browser code here. The asserts live inside the facade steps, so a test is just the story.
+ UI tests. BaseUiTest gives the browser, the facade gives the steps, so there are no selectors and no browser code here.
+ The checks are inside the facade steps, so a test is only a scenario.
  */
 public class ShopUiTest extends BaseUiTest {
 
@@ -15,8 +16,8 @@ public class ShopUiTest extends BaseUiTest {
                 .registerNewUser();
     }
 
-    // Registration already logs the user in, so logout comes first -
-    // otherwise the login step would prove nothing.
+    // Registration logs the user in by itself, so we log out first:
+    // otherwise the login step would prove nothing, the user is already inside.
     @Test
     public void shouldLoginAfterLogout() {
         new ShopUiFacade(page)

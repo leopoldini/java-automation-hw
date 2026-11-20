@@ -6,28 +6,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- Response DTO: the server answer to register / login.
- response.as(AuthResponseDto.class) turns the JSON into this object, so the facade can write
- auth.getUser().getToken() instead of digging through raw text.
- Why these annotations (same set on every *ResponseDto):
- *  @NoArgsConstructor - Jackson creates an empty object first, then fills the fields
- *  @JsonIgnoreProperties - the real response has dozens of fields; without this Jackson fails
- *  on the first one that is not declared here
- *  @Getter, no setters - these values are only read; @JsonProperty on a private field is enough
- *                        for Jackson to write into it
+ * The response body for register and login: what the server answered US.
+ * response.as(AuthResponseDto.class) turns JSON into an object (deserialization),
+ * so the facade writes auth.getUser().getToken() instead of searching for the token in text.
+ * Annotations (the same in all *ResponseDto):
+ *  @NoArgsConstructor - Jackson first creates an empty object, then fills the fields
+ *  @JsonIgnoreProperties - the response has dozens of fields, without it Jackson fails on the first unknown one
+ *  @Getter without setters - we only read the values; Jackson writes into the private field by itself using @JsonProperty
  *
- * Request DTOs use @Builder instead - we build those ourselves, Jackson builds these.
+ * Request DTOs use @Builder: we build them, while response DTOs are built by Jackson.
  */
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthResponseDto {
 
-    // This API returns HTTP 200 even on failure, so this flag is the real result
+    // The API returns HTTP 200 even on failure, so the real result is the status field
     @JsonProperty("status")
     private boolean status;
 
-    // Holds the token used by the next requests
+    // The token for the next requests is inside
     @JsonProperty("user")
     private UserResponseDto user;
 }

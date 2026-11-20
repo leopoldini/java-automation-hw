@@ -10,7 +10,7 @@ public class HomePage extends BasePage {
     private final String loginLink = "a.ico-login";
     private final String logoutLink = "a.ico-logout";
     private final String accountEmail = "a.account";
-    private final String searchInput = "input[type='search']";
+    private final String searchInput = "#small-searchterms";
     private final String productTitleLocator = ".product-title";
 
     public HomePage(Page page) {
@@ -41,6 +41,7 @@ public class HomePage extends BasePage {
     public void searchProduct(String productName) {
         page.fill(searchInput, productName);
         page.keyboard().press("Enter");
+        page.waitForURL("**/search?q=*");
     }
 
     @Step("Check if product '{productName}' is listed in search results")

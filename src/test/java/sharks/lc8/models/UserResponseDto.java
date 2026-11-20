@@ -6,18 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * The "user" object nested inside the register / login response.
- * Annotations are explained in AuthResponseDto.
- *
- * Only the fields I actually use are declared here - the server sends far more,
- * @JsonIgnoreProperties drops the rest.
+ * The nested "user" object from the register and login response. The annotations are explained in AuthResponseDto.
+ * Only the needed fields are declared, the rest (there are many) are dropped by @JsonIgnoreProperties.
  */
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserResponseDto {
 
-    // Goes into the authorization header of the next requests
+    // Goes into the authorization header of the next requests (ApiSpecs.authorized)
     @JsonProperty("token")
     private String token;
 }

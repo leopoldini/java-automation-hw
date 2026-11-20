@@ -3,20 +3,21 @@ package sharks.lc8.pages;
 import com.microsoft.playwright.Page;
 
 /**
- * Home page - only the top links are used: Register, Log in, Log out.
+ * The home page: only the top links are used - Register, Log in, Log out.
  *
- * Rule that makes the chains work:
- *  - action moves to another page -> return that page (openLoginPage returns LoginPage)
- *  - user stays here -> return this
- * So the return type always shows where you actually are.
+ * The rule that keeps the chains working:
+ *  - the action leads to another page -> return that page (openLoginPage returns LoginPage)
+ *  - the user stays here -> return this
+ * The return type always shows where the user is now.
  */
 public class HomePage extends BasePage {
 
-    // Selectors as constants at the top: if the site changes, this is the only place to fix
+    // Selectors are constants at the top: if the site changes, I fix them only here
     private static final String REGISTER_LINK = "a.ico-register";
     private static final String LOGIN_LINK = "a.ico-login";
     private static final String LOGOUT_LINK = "a.ico-logout";
 
+    // super(page): call the BasePage constructor and pass the tab to it
     public HomePage(Page page) {
         super(page);
     }
@@ -36,7 +37,7 @@ public class HomePage extends BasePage {
         return this;
     }
 
-    // The Log out link only exists for a logged-in user, so its presence is the check itself
+    // Only a logged-in user has the Log out link, so its presence is the check
     public boolean isUserLoggedIn() {
         return isVisible(LOGOUT_LINK);
     }

@@ -1,26 +1,28 @@
 package sharks.lc8.models;
 
 /*
- A test user: email, password, login type. My own simple view of a user - the JSON the server
- wants is built from it later in RegisterRequestDto.from(...) / LoginRequestDto.from(...).
- Builder written by hand (Lombok does the same job in the request DTOs):
- new UserDto("a@b.com", "pass", "email")   <- what is the second argument?
- UserDto.builder().email(...).password(...).build()   <- every value is named
-  Also gives a default for what I skip, and one place to validate
+ My test user: email, password, login type.
+ The JSON for the server is built from it later: RegisterRequestDto.from(...) / LoginRequestDto.from(...).
+ The Builder is written by hand: every value is labeled, there is a default value and a check in build().
+ new UserDto("a@b.com", "pass", "email")               <- which one is the password? easy to mix up the order
+ UserDto.builder().email(...).password(...).build()   <- every value is labeled
  */
 public final class UserDto {
 
+    // final: the values do not change after creation (immutable), so only getters, no setters
     private final String email;
     private final String password;
     private final String type;
 
-    // Private: the builder is the only way in, so build() validation cannot be skipped
+    // private: the only way to create it is the Builder, so the check in build() cannot be skipped.
+    // The constructor itself checks nothing, it only copies the values from the Builder.
     private UserDto(Builder builder) {
         this.email = builder.email;
         this.password = builder.password;
         this.type = builder.type;
     }
 
+    // static: there is no user yet, so we call it by the class name. Every call = a new Builder.
     public static Builder builder() {
         return new Builder();
     }
@@ -37,22 +39,27 @@ public final class UserDto {
         return type;
     }
 
-    // Password left out on purpose so it never reaches the logs
+    // The password is left out on purpose, so it does not get into the logs
     @Override
     public String toString() {
         return "UserDto{email='" + email + "', type='" + type + "'}";
     }
 
-    // Collects the values one by one. Every method returns this - that is what makes it chainable.
+    // A nested class: it lives inside UserDto, so it can call its private constructor.
+    // static: the Builder is created before the user, without a UserDto object.
     public static final class Builder {
 
+        // No final: email and password are filled step by step.
         private String email;
         private String password;
-        private String type = "email";
+        // The login type is always "email" (the default value), the tests need no other type.
+        private final String type = "email";
 
+        // private: the Builder is available only through UserDto.builder()
         private Builder() {
         }
 
+        // return this = the same Builder, so the calls go in a chain, dot after dot (Fluent)
         public Builder email(String email) {
             this.email = email;
             return this;
@@ -63,12 +70,8 @@ public final class UserDto {
             return this;
         }
 
-        public Builder type(String type) {
-            this.type = type;
-            return this;
-        }
-
-        // Last step: a half-filled user fails here, not later inside a request
+        // The last step: check the required fields. A half-empty user fails here, not in the request.
+        // isBlank: an empty string or only spaces.
         public UserDto build() {
             if (email == null || email.isBlank()) {
                 throw new IllegalStateException("email is required");
@@ -76,6 +79,7 @@ public final class UserDto {
             if (password == null || password.isBlank()) {
                 throw new IllegalStateException("password is required");
             }
+            // The Builder passes itself into the private UserDto constructor
             return new UserDto(this);
         }
     }

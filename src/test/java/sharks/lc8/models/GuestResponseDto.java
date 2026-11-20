@@ -6,16 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Answer of /auth/guest. Annotations are explained in AuthResponseDto.
- * A separate DTO and not AuthResponseDto, because this response is flat - {"token": "..."} -
- * with no "user" object around the token. Reusing AuthResponseDto here gave an NPE.
+ * The /auth/guest response. The annotations are explained in AuthResponseDto.
+ * A separate DTO, because the response is flat - {"token": "..."} - without a "user" object.
+ * With AuthResponseDto the user field was null, and getUser().getToken() failed with NullPointerException.
  */
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GuestResponseDto {
 
-    // Guest token: decoded it holds "id": 0, the user token holds the real user id
+    // The guest token: it has "id": 0 inside, while a user token has a real id
     @JsonProperty("token")
     private String token;
 }
